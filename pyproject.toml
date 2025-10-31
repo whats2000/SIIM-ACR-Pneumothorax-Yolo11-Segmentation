@@ -1,0 +1,94 @@
+[project]
+name = "siim-acr-pneumothorax-yolo11-segmentation"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "ipython>=8.37.0",
+    "jupyter>=1.1.1",
+    "matplotlib>=3.10.7",
+    "numpy>=2.2.6",
+    "pillow>=12.0.0",
+    "pandas>=2.2.3",
+    "pydicom>=3.0.1",
+    "opencv-python-headless>=4.11.0.86",
+    "scikit-image>=0.25.0",
+    "seaborn>=0.13.2",
+    "tqdm>=4.67.1",
+    "typer>=0.12.5",
+    "ultralytics>=8.3.221",
+]
+
+[project.optional-dependencies]
+cpu = [
+  "torch>=2.7.0",
+  "torchvision>=0.22.0",
+  "torchaudio>=2.7.0",
+]
+cu118 = [
+  "torch>=2.7.0",
+  "torchvision>=0.22.0",
+  "torchaudio>=2.7.0",
+]
+cu126 = [
+  "torch>=2.7.0",
+  "torchvision>=0.22.0",
+  "torchaudio>=2.7.0",
+]
+cu128 = [
+  "torch>=2.7.0",
+  "torchvision>=0.22.0",
+  "torchaudio>=2.7.0",
+]
+
+[tool.uv]
+conflicts = [
+  [ { extra = "cpu"   }, { extra = "cu118" } ],
+  [ { extra = "cpu"   }, { extra = "cu126" } ],
+  [ { extra = "cpu"   }, { extra = "cu128" } ],
+  [ { extra = "cu118" }, { extra = "cu126" } ],
+  [ { extra = "cu118" }, { extra = "cu128" } ],
+  [ { extra = "cu126" }, { extra = "cu128" } ],
+]
+
+[[tool.uv.index]]
+name     = "pytorch-cpu"
+url      = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[[tool.uv.index]]
+name     = "pytorch-cu118"
+url      = "https://download.pytorch.org/whl/cu118"
+explicit = true
+
+[[tool.uv.index]]
+name     = "pytorch-cu126"
+url      = "https://download.pytorch.org/whl/cu126"
+explicit = true
+
+[[tool.uv.index]]
+name     = "pytorch-cu128"
+url      = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+# 2) Tell uv where to look for each PyTorch package
+[tool.uv.sources]
+torch = [
+  { index = "pytorch-cpu",   extra = "cpu"   },
+  { index = "pytorch-cu118", extra = "cu118" },
+  { index = "pytorch-cu126", extra = "cu126" },
+  { index = "pytorch-cu128", extra = "cu128" },
+]
+torchvision = [
+  { index = "pytorch-cpu",   extra = "cpu"   },
+  { index = "pytorch-cu118", extra = "cu118" },
+  { index = "pytorch-cu126", extra = "cu126" },
+  { index = "pytorch-cu128", extra = "cu128" },
+]
+torchaudio = [
+  { index = "pytorch-cpu",   extra = "cpu"   },
+  { index = "pytorch-cu118", extra = "cu118" },
+  { index = "pytorch-cu126", extra = "cu126" },
+  { index = "pytorch-cu128", extra = "cu128" },
+]

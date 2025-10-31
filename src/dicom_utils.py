@@ -77,6 +77,10 @@ def save_image(array: np.ndarray, output_path: Path) -> None:
 def decode_rle_mask(encoded_pixels: str | float | None, shape: tuple[int, int]) -> np.ndarray:
     """Decode the competition RLE mask into a boolean array.
 
+    The RLE format is: start1 length1 offset2 length2 offset3 length3 ...
+    where start1 is 1-indexed, and subsequent values are offsets from the
+    end of the previous run.
+
     Returns an array with shape ``shape`` in Fortran order, matching the original
     Kaggle competition specification.
     """
@@ -89,13 +93,25 @@ def decode_rle_mask(encoded_pixels: str | float | None, shape: tuple[int, int]) 
     except ValueError as exc:  # pragma: no cover - defensive branch
         raise ValueError(f"Could not parse RLE mask: {encoded_pixels!r}") from exc
 
-    starts = np.asarray(pixel_tokens[0::2], dtype=np.int64) - 1
-    lengths = np.asarray(pixel_tokens[1::2], dtype=np.int64)
-    ends = starts + lengths
+    if len(pixel_tokens) < 2:
+        return np.zeros(shape, dtype=np.uint8)
 
     mask = np.zeros(shape[0] * shape[1], dtype=np.uint8)
-    for start, end in zip(starts, ends):
-        mask[start:end] = 1
+    
+    # First pair is start (1-indexed) and length
+    current_pos = pixel_tokens[0] - 1  # Convert to 0-indexed
+    length = pixel_tokens[1]
+    mask[current_pos:current_pos + length] = 1
+    current_pos += length
+    
+    # Subsequent pairs are offset and length
+    for i in range(2, len(pixel_tokens), 2):
+        if i + 1 < len(pixel_tokens):
+            offset = pixel_tokens[i]
+            length = pixel_tokens[i + 1]
+            current_pos += offset
+            mask[current_pos:current_pos + length] = 1
+            current_pos += length
 
     return mask.reshape(shape, order="F")
 
